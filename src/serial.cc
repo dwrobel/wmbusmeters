@@ -223,12 +223,16 @@ SerialDeviceTTY::~SerialDeviceTTY()
 bool SerialDeviceTTY::open(bool fail_if_not_ok)
 {
     bool ok = checkCharacterDeviceExists(device_.c_str(), fail_if_not_ok);
-    if (!ok) return false;
+    if (!ok) {
+        debug("(serialtty) character devices does not exist \"%s\"\n", device_.c_str());
+        return false;
+    }
     fd_ = openSerialTTY(device_.c_str(), baud_rate_);
     if (fd_ == -1) {
         if (fail_if_not_ok) {
             error("Could not open %s with %d baud N81\n", device_.c_str(), baud_rate_);
         } else {
+            debug("(serialtty) could not open \"%s\" with %d baud N81\n", device_.c_str(), baud_rate_);
             return false;
         }
     }
@@ -367,7 +371,10 @@ bool SerialDeviceCommand::open(bool fail_if_not_ok)
 {
     expectAscii();
     bool ok = invokeBackgroundShell("/bin/sh", args_, envs_, &fd_, &pid_);
-    if (!ok) return false;
+    if (!ok) {
+        debug("(serialcmd) could not invoke background shell\n");
+        return false;
+    }
     manager_->opened(this);
     setIsStdin();
     verbose("(serialcmd) opened %s\n", command_.c_str());
@@ -482,6 +489,7 @@ bool SerialDeviceFile::open(bool fail_if_not_ok)
             }
             else
             {
+                debug("(serialfile) could not open file %s for reading.\n", file_.c_str());
                 return false;
             }
         }

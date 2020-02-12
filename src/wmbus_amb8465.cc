@@ -447,7 +447,10 @@ bool detectAMB8465(string device, SerialCommunicationManager *manager)
     // Talk to the device and expect a very specific answer.
     auto serial = manager->createSerialDeviceTTY(device.c_str(), 9600);
     bool ok = serial->open(false);
-    if (!ok) return false;
+    if (!ok) {
+        debug("(im871a) could not open \"%d\"\n", device.c_str());
+        return false;
+    }
 
     vector<uchar> data;
     // First clear out any data in the queue.

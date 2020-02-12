@@ -337,7 +337,10 @@ bool detectCUL(string device, SerialCommunicationManager *manager)
     // Talk to the device and expect a very specific answer.
     auto serial = manager->createSerialDeviceTTY(device.c_str(), 38400);
     bool ok = serial->open(false);
-    if (!ok) return false;
+    if (!ok) {
+        debug("(cul) could not open tty %s for reading.\n", device.c_str());
+        return false;
+    }
 
     vector<uchar> data;
     // send '-'+CRLF -> should be an unsupported command for CUL

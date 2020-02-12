@@ -230,7 +230,11 @@ bool detectD1TC(string device, int baud, SerialCommunicationManager *manager)
     // even respond. The only thing we can do is to try to open the serial device.
     auto serial = manager->createSerialDeviceTTY(device.c_str(), baud);
     bool ok = serial->open(false);
-    if (!ok) return false;
+    if (!ok)
+    {
+        debug("(d1tc) could not open tty %s for reading.\n", device.c_str());
+        return false;
+    }
 
     serial->close();
     return true;
