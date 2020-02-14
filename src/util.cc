@@ -998,7 +998,10 @@ AccessCheck checkIfExistsAndSameGroup(string device)
     int ok = stat(device.c_str(), &sb);
 
     // The file did not exist.
-    if (ok) return AccessCheck::NotThere;
+    if (ok) {
+        debug("(util) device not there %s\n", device.c_str());
+        return AccessCheck::NotThere;
+    }
 
 #if defined(__APPLE__) && defined(__MACH__)
         int groups[256];
@@ -1008,19 +1011,30 @@ AccessCheck checkIfExistsAndSameGroup(string device)
     int ngroups = 256;
 
     struct passwd *p = getpwuid(getuid());
+    struct group *g = getgrgid(sb.st_gid);
+
+    debug("(util) user %s width gid %d trying to access device %s with gid %d (%d)\n", p->pw_name, p->pw_gid,
+          device.c_str(), sb.st_gid, g->gr_gid);
 
     int rc = getgrouplist(p->pw_name, p->pw_gid, groups, &ngroups);
     if (rc < 0) {
         error("(wmbusmeters) cannot handle users with more than 256 groups\n");
     }
-    struct group *g = getgrgid(sb.st_gid);
 
     for (int i=0; i<ngroups; ++i) {
-        if (groups[i] == g->gr_gid) {
+        debug("(util) is gid %d == %d ", groups[i], g->gr_gid);
+        if (groups[i] == g->gr_gid)
+        {
+            debug("YES!\n");
             return AccessCheck::OK;
+        }
+        else
+        {
+            debug("no.\n");
         }
     }
 
+    debug("(util) user %s is not in same group as device %s\n", p->pw_name, device.c_str());
     return AccessCheck::NotSameGroup;
 }
 
