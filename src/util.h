@@ -121,7 +121,7 @@ void trimWhitespace(std::string *s);
 // Returns true if device exists and this programs user, belongs
 // to the same group that the device belongs to.
 enum class AccessCheck { NotThere, NotSameGroup, OK };
-AccessCheck checkIfExistsAndSameGroup(std::string device);
+AccessCheck checkIfExistsAndCanBeAccessed(std::string device);
 // Count the number of 1:s in the binary number v.
 int countSetBits(int v);
 

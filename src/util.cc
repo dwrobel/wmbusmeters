@@ -991,7 +991,7 @@ string strdatetime(struct tm *datetime)
     return string(buf);
 }
 
-AccessCheck checkIfExistsAndSameGroup(string device)
+AccessCheck checkIfExistsAndCanBeAccessed(string device)
 {
     struct stat sb;
 
@@ -1013,8 +1013,33 @@ AccessCheck checkIfExistsAndSameGroup(string device)
     struct passwd *p = getpwuid(getuid());
     struct group *g = getgrgid(sb.st_gid);
 
-    debug("(util) user %s width gid %d trying to access device %s with gid %d (%d)\n", p->pw_name, p->pw_gid,
-          device.c_str(), sb.st_gid, g->gr_gid);
+    debug("(util) user %s (uid %d gid %d) trying to access device %s with owner uid %d gid %d (%d)\n",
+          p->pw_name, p->pw_uid, p->pw_gid,
+          device.c_str(), sb.st_uid, sb.st_gid, g->gr_gid);
+
+    if (sb.st_mode & S_IROTH && sb.st_mode & S_IWOTH)
+    {
+        debug("(util) everyone can open the device.\n");
+        return AccessCheck::OK;
+    }
+
+    if (p->pw_uid == 0)
+    {
+        debug("(util) user is root.\n");
+        return AccessCheck::OK;
+    }
+
+    if (p->pw_uid == sb.st_uid)
+    {
+        debug("(util) user owns device.\n");
+        return AccessCheck::OK;
+    }
+
+    if (p->pw_gid == sb.st_gid)
+    {
+        debug("(util) users group is the device group.\n");
+        return AccessCheck::OK;
+    }
 
     int rc = getgrouplist(p->pw_name, p->pw_gid, groups, &ngroups);
     if (rc < 0) {

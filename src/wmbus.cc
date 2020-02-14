@@ -3468,7 +3468,7 @@ AccessCheck findAndDetect(SerialCommunicationManager *manager, string *out_devic
 {
     string dev = device_root;
     debug("(%s) exists? %s\n", dongle_name.c_str(), dev.c_str());
-    AccessCheck ac = checkIfExistsAndSameGroup(dev);
+    AccessCheck ac = checkIfExistsAndCanBeAccessed(dev);
     *out_device = dev;
     if (ac == AccessCheck::OK)
     {
@@ -3489,7 +3489,7 @@ AccessCheck findAndDetect(SerialCommunicationManager *manager, string *out_devic
     {
         dev = device_root+"_"+to_string(n);
         debug("(%s) exists? %s\n", dongle_name.c_str(), dev.c_str());
-        AccessCheck ac = checkIfExistsAndSameGroup(dev);
+        AccessCheck ac = checkIfExistsAndCanBeAccessed(dev);
         *out_device = dev;
         if (ac == AccessCheck::OK)
         {
