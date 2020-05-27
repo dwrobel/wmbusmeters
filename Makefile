@@ -95,7 +95,7 @@ endif
 
 $(info Building $(VERSION))
 
-CXXFLAGS ?= $(DEBUG_FLAGS) -fPIC -fmessage-length=0 -std=c++11 -Wall -Wno-unused-function
+CXXFLAGS ?= $(DEBUG_FLAGS) -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches -mtune=generic -fasynchronous-unwind-tables
 CXXFLAGS += -I$(BUILD)
 
 LDFLAGS  ?= $(DEBUG_LDFLAGS)
